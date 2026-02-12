@@ -1,0 +1,66 @@
+{
+  "expo": {
+    "name": "PawPals",
+    "slug": "dog-sitting-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1A8A7D"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pawpals.dogsitting",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "We need your location to show nearby dog sitters and dog owners.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "We need your location to show nearby dog sitters and dog owners.",
+        "NSCameraUsageDescription": "We need camera access to take profile photos.",
+        "NSPhotoLibraryUsageDescription": "We need photo library access to upload profile photos."
+      },
+      "config": {
+        "googleMapsApiKey": "YOUR_GOOGLE_MAPS_IOS_API_KEY"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1A8A7D"
+      },
+      "package": "com.pawpals.dogsitting",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "YOUR_GOOGLE_MAPS_ANDROID_API_KEY"
+        }
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-location",
+      "expo-image-picker",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#1A8A7D"
+        }
+      ]
+    ],
+    "extra": {
+      "apiUrl": "http://localhost:4000",
+      "wsUrl": "ws://localhost:4000"
+    }
+  }
+}

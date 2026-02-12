@@ -1,0 +1,19 @@
+{
+  "ignore_dirs": [
+    ".git",
+    ".hg",
+    "node_modules/.cache",
+    "node_modules/.staging",
+    ".expo",
+    ".expo-shared",
+    "ios/Pods",
+    "ios/build",
+    "android/app/build",
+    "android/.gradle",
+    "coverage",
+    "dist",
+    "build"
+  ],
+  "fsevents_latency": 0.05,
+  "settle": 20
+}
