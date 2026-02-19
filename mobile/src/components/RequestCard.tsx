@@ -130,7 +130,7 @@ export const RequestCard: React.FC<RequestCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.card,
     borderRadius: BORDER_RADIUS.xl,
     padding: SPACING.base,
     marginBottom: SPACING.md,

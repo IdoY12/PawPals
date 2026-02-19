@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import { User, UserType } from './models/User';
 import { Request, RequestStatus } from './models/Request';
@@ -240,14 +241,20 @@ async function seedDatabase() {
     await Message.deleteMany({});
     await Review.deleteMany({});
 
+    // Hash passwords (insertMany doesn't trigger pre-save hooks)
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash('password123', salt);
+    const ownersWithHash = dogOwners.map(o => ({ ...o, password: hashedPassword }));
+    const sittersWithHash = dogSitters.map(s => ({ ...s, password: hashedPassword }));
+
     // Create dog owners
     console.log('👤 Creating dog owners...');
-    const createdOwners = await User.insertMany(dogOwners);
+    const createdOwners = await User.insertMany(ownersWithHash);
     console.log(`   Created ${createdOwners.length} dog owners`);
 
     // Create dog sitters
     console.log('🐕 Creating dog sitters...');
-    const createdSitters = await User.insertMany(dogSitters);
+    const createdSitters = await User.insertMany(sittersWithHash);
     console.log(`   Created ${createdSitters.length} dog sitters`);
 
     // Create some sample requests

@@ -19,7 +19,7 @@ import { NEW_MESSAGE_IN_CONVERSATION } from '../graphql/subscriptions';
 import { useAuth } from '../context/AuthContext';
 import { ChatBubble, TypingIndicator } from '../components/ChatBubble';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '../constants/theme';
-import { generateConversationId, formatDate } from '../utils/helpers';
+import { generateConversationId } from '../utils/helpers';
 import {
   initializeSocket,
   joinConversation,
@@ -41,7 +41,7 @@ export const ChatScreen: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [otherUserTyping, setOtherUserTyping] = useState(false);
   const flatListRef = useRef<FlatList>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const conversationId = generateConversationId(user?.id || '', userId);
 
@@ -171,20 +171,6 @@ export const ChatScreen: React.FC = () => {
     }
   };
 
-  // Group messages by date
-  const groupedMessages = messages.reduce((groups: any[], message) => {
-    const date = formatDate(message.createdAt);
-    const lastGroup = groups[groups.length - 1];
-
-    if (lastGroup && lastGroup.date === date) {
-      lastGroup.messages.push(message);
-    } else {
-      groups.push({ date, messages: [message] });
-    }
-
-    return groups;
-  }, []);
-
   const renderMessage = ({ item }: { item: Message }) => {
     const isOwnMessage = item.senderId === user?.id;
     return (
@@ -195,14 +181,6 @@ export const ChatScreen: React.FC = () => {
       />
     );
   };
-
-  const renderDateSeparator = (date: string) => (
-    <View style={styles.dateSeparator}>
-      <View style={styles.dateLine} />
-      <Text style={styles.dateText}>{date}</Text>
-      <View style={styles.dateLine} />
-    </View>
-  );
 
   if (loading && !data) {
     return (
@@ -285,6 +263,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: COLORS.background,
   },
   messagesList: {
     paddingVertical: SPACING.md,
@@ -302,30 +281,12 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     textAlign: 'center',
   },
-  dateSeparator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: SPACING.md,
-    paddingHorizontal: SPACING.base,
-  },
-  dateLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.gray300,
-  },
-  dateText: {
-    fontSize: FONTS.sizes.xs,
-    color: COLORS.gray500,
-    marginHorizontal: SPACING.md,
-    textTransform: 'uppercase',
-  },
   inputContainer: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: COLORS.borderLight,
-    ...SHADOWS.sm,
+    borderTopColor: COLORS.border,
   },
   inputWrapper: {
     flexDirection: 'row',

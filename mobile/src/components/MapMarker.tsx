@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     width: 48, height: 48, borderRadius: 24,
     justifyContent: 'center', alignItems: 'center',
     borderWidth: 3, borderColor: COLORS.sitter,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     ...SHADOWS.lg,
   },
   markerImage: { width: 42, height: 42, borderRadius: 21 },
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     position: 'absolute', top: 0, right: 0,
     width: 14, height: 14, borderRadius: 7,
     backgroundColor: COLORS.success,
-    borderWidth: 2, borderColor: COLORS.white,
+    borderWidth: 2, borderColor: COLORS.surface,
   },
   markerTip: {
     width: 0, height: 0,
@@ -179,7 +179,11 @@ const styles = StyleSheet.create({
   callout: { width: 200 },
   // Callout (wider - for unified RequestMarker)
   calloutWide: { width: 230 },
-  calloutBody: { padding: SPACING.sm },
+  calloutBody: {
+    padding: SPACING.sm,
+    backgroundColor: COLORS.surface,
+    borderRadius: BORDER_RADIUS.lg,
+  },
   // Header row with avatar + name (for RequestMarker unified callout)
   calloutHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.sm },
   calloutAvatar: { width: 36, height: 36, borderRadius: 18 },

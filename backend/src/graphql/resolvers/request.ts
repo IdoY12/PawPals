@@ -49,7 +49,7 @@ export const requestResolvers = {
       { id }: { id: string },
       { user }: GraphQLContext
     ): Promise<IRequest | null> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       const request = await Request.findById(id);
       if (!request) {
@@ -64,7 +64,7 @@ export const requestResolvers = {
       { status }: { status?: RequestStatus },
       { user }: GraphQLContext
     ): Promise<IRequest[]> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       if (user.userType !== UserType.OWNER) {
         throwValidationError('Only owners can view their requests');
@@ -92,7 +92,7 @@ export const requestResolvers = {
       },
       { user }: GraphQLContext
     ): Promise<(IRequest & { distance?: number })[]> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       const radiusInMeters = radius * 1000;
 
@@ -117,7 +117,7 @@ export const requestResolvers = {
           [longitude, latitude],
           r.location.coordinates as [number, number]
         );
-        return { ...r.toObject(), id: r._id.toString(), distance };
+        return { ...r.toObject(), id: r._id.toString(), distance } as any;
       });
     },
   },
@@ -129,7 +129,7 @@ export const requestResolvers = {
       { input }: { input: CreateRequestInput },
       { user }: GraphQLContext
     ): Promise<IRequest> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       if (user.userType !== UserType.OWNER) {
         throwValidationError('Only owners can create requests');
@@ -178,7 +178,7 @@ export const requestResolvers = {
       { id, input }: { id: string; input: UpdateRequestInput },
       { user }: GraphQLContext
     ): Promise<IRequest> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       const request = await Request.findById(id);
       if (!request) {
@@ -234,7 +234,7 @@ export const requestResolvers = {
       { id }: { id: string },
       { user }: GraphQLContext
     ): Promise<boolean> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       const request = await Request.findById(id);
       if (!request) {
@@ -256,7 +256,7 @@ export const requestResolvers = {
       { id }: { id: string },
       { user }: GraphQLContext
     ): Promise<IRequest> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       const request = await Request.findById(id);
       if (!request) {
@@ -281,7 +281,7 @@ export const requestResolvers = {
       { id }: { id: string },
       { user }: GraphQLContext
     ): Promise<IRequest> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       const request = await Request.findById(id);
       if (!request) {

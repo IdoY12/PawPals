@@ -90,7 +90,7 @@ export const ProfileScreen: React.FC = () => {
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'] as ImagePicker.MediaType[],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
@@ -344,7 +344,7 @@ const infoStyles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: COLORS.gray50,
+    backgroundColor: COLORS.gray100,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.md,
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   // Hero
   heroHeader: {
     alignItems: 'center', paddingTop: SPACING.xl, paddingBottom: SPACING.xl,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     borderBottomLeftRadius: BORDER_RADIUS.xxl, borderBottomRightRadius: BORDER_RADIUS.xxl,
     ...SHADOWS.lg,
   },
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
     position: 'absolute', bottom: 0, right: 0,
     width: 30, height: 30, borderRadius: 15,
     backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center',
-    borderWidth: 2, borderColor: COLORS.white,
+    borderWidth: 2, borderColor: COLORS.surface,
   },
   heroName: { fontSize: FONTS.sizes.xxl, fontWeight: '700', color: COLORS.textPrimary, marginBottom: SPACING.xs },
   rolePill: { paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs, borderRadius: BORDER_RADIUS.full, marginBottom: SPACING.sm },
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   newLabel: { fontSize: FONTS.sizes.sm, color: COLORS.textMuted, fontStyle: 'italic' },
   // Card
   card: {
-    backgroundColor: COLORS.white, borderRadius: BORDER_RADIUS.xl,
+    backgroundColor: COLORS.card, borderRadius: BORDER_RADIUS.xl,
     margin: SPACING.base, marginBottom: 0, padding: SPACING.base,
     borderWidth: 1, borderColor: COLORS.borderLight, ...SHADOWS.sm,
   },
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
   logoutBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     margin: SPACING.base, padding: SPACING.md,
-    backgroundColor: COLORS.white, borderRadius: BORDER_RADIUS.lg,
+    backgroundColor: COLORS.surface, borderRadius: BORDER_RADIUS.lg,
     borderWidth: 1, borderColor: COLORS.errorLight, gap: SPACING.sm,
   },
   logoutText: { fontSize: FONTS.sizes.md, fontWeight: '600', color: COLORS.error },

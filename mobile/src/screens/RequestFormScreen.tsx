@@ -207,7 +207,7 @@ export const RequestFormScreen: React.FC = () => {
           style: 'destructive',
           onPress: async () => {
             try {
-              await deleteRequest({ variables: { id: existingRequest.id } });
+              await deleteRequest({ variables: { id: existingRequest!.id } });
               navigation.goBack();
             } catch (error: any) {
               Alert.alert('Error', error.message || 'Failed to delete.');
@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
   },
   // Text areas
   textAreaContainer: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.card,
     borderRadius: BORDER_RADIUS.lg,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -572,7 +572,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.card,
     borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.md,
     borderWidth: 1,
@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   pickerModal: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     borderTopLeftRadius: BORDER_RADIUS.xxl,
     borderTopRightRadius: BORDER_RADIUS.xxl,
     paddingBottom: SPACING.xxxl,
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
   rateCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.card,
     borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.md,
     borderWidth: 1,

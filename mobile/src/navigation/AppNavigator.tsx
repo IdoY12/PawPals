@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, View, StyleSheet, Platform } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,11 +17,25 @@ import {
   UserDetailScreen,
   RequestsScreen,
 } from '../screens';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '../constants/theme';
+import { COLORS, FONTS, SPACING, SHADOWS } from '../constants/theme';
 import { RootStackParamList, MainTabParamList } from '../types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
+
+const DarkNavTheme = {
+  ...DefaultTheme,
+  dark: true,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: COLORS.primary,
+    background: COLORS.background,
+    card: COLORS.surface,
+    text: COLORS.textPrimary,
+    border: COLORS.border,
+    notification: COLORS.primary,
+  },
+};
 
 const MainTabs: React.FC = () => {
   const { user } = useAuth();
@@ -56,11 +70,11 @@ const MainTabs: React.FC = () => {
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.gray400,
         tabBarStyle: {
-          backgroundColor: COLORS.white,
-          borderTopWidth: 0,
+          backgroundColor: COLORS.surface,
+          borderTopWidth: 1,
+          borderTopColor: COLORS.border,
           height: Platform.OS === 'ios' ? 88 : 64,
           paddingTop: SPACING.sm,
-          ...SHADOWS.lg,
         },
         tabBarLabelStyle: {
           fontSize: FONTS.sizes.xs,
@@ -68,13 +82,14 @@ const MainTabs: React.FC = () => {
           marginTop: 2,
         },
         headerStyle: {
-          backgroundColor: COLORS.white,
+          backgroundColor: COLORS.surface,
         },
         headerTitleStyle: {
           fontSize: FONTS.sizes.lg,
           fontWeight: '700',
           color: COLORS.textPrimary,
         },
+        headerTintColor: COLORS.primary,
         headerShadowVisible: false,
       })}
     >
@@ -133,12 +148,12 @@ export const AppNavigator: React.FC = () => {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={DarkNavTheme}>
       <Stack.Navigator
         screenOptions={{
-          headerStyle: { backgroundColor: COLORS.white },
+          headerStyle: { backgroundColor: COLORS.surface },
           headerTintColor: COLORS.primary,
-          headerTitleStyle: { fontWeight: '700', fontSize: FONTS.sizes.lg },
+          headerTitleStyle: { fontWeight: '700', fontSize: FONTS.sizes.lg, color: COLORS.textPrimary },
           headerShadowVisible: false,
           headerBackTitleVisible: false,
           contentStyle: { backgroundColor: COLORS.background },

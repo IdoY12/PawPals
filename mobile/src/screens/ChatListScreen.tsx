@@ -185,12 +185,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: COLORS.background,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: SPACING.xl,
+    backgroundColor: COLORS.background,
   },
   errorText: {
     fontSize: FONTS.sizes.base,
@@ -218,7 +220,7 @@ const styles = StyleSheet.create({
   conversationItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.base,
   },
@@ -255,7 +257,7 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     backgroundColor: COLORS.primary,
     borderWidth: 2,
-    borderColor: COLORS.white,
+    borderColor: COLORS.surface,
   },
   contentContainer: {
     flex: 1,

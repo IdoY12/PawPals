@@ -1,0 +1,33 @@
+version: '3.9'
+services:
+  mongodb:
+    image: mongo:7
+    container_name: pawpals-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: dog-sitting
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pawpals-backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/dog-sitting
+      JWT_SECRET: ${JWT_SECRET:-supersecretjwtkey}
+      PORT: 4000
+      FRONTEND_URL: "*"
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend/uploads:/app/uploads
+
+volumes:
+  mongo_data:

@@ -20,7 +20,7 @@ export const messageResolvers = {
       __: unknown,
       { user }: GraphQLContext
     ): Promise<any[]> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       // Use aggregation to get conversations with last message and unread count
       const conversations = await Message.aggregate([
@@ -105,7 +105,7 @@ export const messageResolvers = {
       { userId, limit = 50, offset = 0 }: { userId: string; limit?: number; offset?: number },
       { user }: GraphQLContext
     ): Promise<IMessage[]> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       // Generate conversation ID
       const sortedIds = [user._id.toString(), userId].sort();
@@ -126,7 +126,7 @@ export const messageResolvers = {
       __: unknown,
       { user }: GraphQLContext
     ): Promise<number> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       const count = await Message.countDocuments({
         receiverId: user._id,
@@ -144,7 +144,7 @@ export const messageResolvers = {
       { receiverId, content }: { receiverId: string; content: string },
       { user }: GraphQLContext
     ): Promise<IMessage> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       if (!content.trim()) {
         throwValidationError('Message content cannot be empty');
@@ -188,7 +188,7 @@ export const messageResolvers = {
       { conversationId }: { conversationId: string },
       { user }: GraphQLContext
     ): Promise<boolean> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       await Message.updateMany(
         {
@@ -211,7 +211,7 @@ export const messageResolvers = {
   Subscription: {
     messageReceived: {
       subscribe: (_: unknown, __: unknown, { user }: GraphQLContext) => {
-        if (!user) throwAuthError();
+        if (!user) return throwAuthError();
         return pubsub.asyncIterator([MESSAGE_RECEIVED]);
       },
       resolve: (
@@ -232,7 +232,7 @@ export const messageResolvers = {
         { conversationId }: { conversationId: string },
         { user }: GraphQLContext
       ) => {
-        if (!user) throwAuthError();
+        if (!user) return throwAuthError();
         return pubsub.asyncIterator([`${NEW_MESSAGE_IN_CONVERSATION}_${conversationId}`]);
       },
       resolve: (payload: { newMessageInConversation: IMessage }) => {

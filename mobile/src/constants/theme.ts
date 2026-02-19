@@ -1,70 +1,70 @@
 import { Platform } from 'react-native';
 
 export const COLORS = {
-  // Primary - Deep teal gradient
-  primary: '#1A8A7D',
-  primaryDark: '#14706A',
-  primaryLight: '#2DB5A5',
-  primaryMuted: '#E8F6F4',
+  // Primary — teal
+  primary: '#2EBFAD',
+  primaryDark: '#1A9B8A',
+  primaryLight: '#4DD9C7',
+  primaryMuted: '#1A3330',
 
-  // Accent - Warm amber
+  // Secondary — amber
   secondary: '#F59E0B',
   secondaryDark: '#D97706',
   secondaryLight: '#FCD34D',
-  secondaryMuted: '#FEF3C7',
+  secondaryMuted: '#2D2000',
 
-  // Neutrals - Warm grays
-  white: '#FFFFFF',
-  black: '#0F172A',
-  gray50: '#FAFAFA',
-  gray100: '#F4F4F5',
-  gray200: '#E4E4E7',
-  gray300: '#D4D4D8',
-  gray400: '#A1A1AA',
-  gray500: '#71717A',
-  gray600: '#52525B',
-  gray700: '#3F3F46',
-  gray800: '#27272A',
-  gray900: '#18181B',
-
-  // Status
-  success: '#10B981',
-  successLight: '#D1FAE5',
-  warning: '#F59E0B',
-  warningLight: '#FEF3C7',
-  error: '#EF4444',
-  errorLight: '#FEE2E2',
-  info: '#3B82F6',
-  infoLight: '#DBEAFE',
-
-  // Backgrounds
-  background: '#F8FAFB',
-  surface: '#FFFFFF',
-  surfaceElevated: '#FFFFFF',
-  card: '#FFFFFF',
-  overlay: 'rgba(15, 23, 42, 0.4)',
+  // Backgrounds — deep dark
+  background: '#0D1117',
+  surface: '#161B22',
+  surfaceElevated: '#21262D',
+  card: '#1C2128',
+  overlay: 'rgba(0, 0, 0, 0.6)',
 
   // Text
-  textPrimary: '#0F172A',
-  textSecondary: '#52525B',
-  textMuted: '#A1A1AA',
+  textPrimary: '#E6EDF3',
+  textSecondary: '#8B949E',
+  textMuted: '#484F58',
   textLight: '#FFFFFF',
-  textLink: '#1A8A7D',
+  textLink: '#2EBFAD',
+
+  // Neutrals — dark grays
+  white: '#FFFFFF',
+  black: '#010409',
+  gray50: '#161B22',
+  gray100: '#21262D',
+  gray200: '#30363D',
+  gray300: '#484F58',
+  gray400: '#6E7681',
+  gray500: '#8B949E',
+  gray600: '#B1BAC4',
+  gray700: '#C9D1D9',
+  gray800: '#E6EDF3',
+  gray900: '#F0F6FC',
+
+  // Status
+  success: '#3FB950',
+  successLight: '#0D2B12',
+  warning: '#D29922',
+  warningLight: '#2D1F00',
+  error: '#F85149',
+  errorLight: '#300D0D',
+  info: '#58A6FF',
+  infoLight: '#0D1F3A',
 
   // Borders
-  border: '#E4E4E7',
-  borderLight: '#F4F4F5',
-  borderFocus: '#1A8A7D',
+  border: '#30363D',
+  borderLight: '#21262D',
+  borderFocus: '#2EBFAD',
 
   // User types
-  owner: '#8B5CF6',     // Purple for owners
-  ownerLight: '#EDE9FE',
-  sitter: '#0EA5E9',    // Sky blue for sitters
-  sitterLight: '#E0F2FE',
+  owner: '#A371F7',
+  ownerLight: '#1E1030',
+  sitter: '#58A6FF',
+  sitterLight: '#0D1F3A',
 
   // Rating
-  star: '#F59E0B',
-  starEmpty: '#E4E4E7',
+  star: '#E3B341',
+  starEmpty: '#30363D',
 };
 
 export const FONTS = {
@@ -116,40 +116,120 @@ export const SHADOWS = {
     elevation: 0,
   },
   sm: {
-    shadowColor: '#0F172A',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
+    shadowOpacity: 0.3,
     shadowRadius: 3,
-    elevation: 1,
-  },
-  md: {
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
     elevation: 2,
   },
-  lg: {
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
+  md: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
     elevation: 4,
   },
+  lg: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 6,
+  },
   xl: {
-    shadowColor: '#0F172A',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.5,
     shadowRadius: 20,
-    elevation: 8,
+    elevation: 10,
   },
 };
 
 export const MAP_STYLE = [
   {
+    elementType: 'geometry',
+    stylers: [{ color: '#212121' }],
+  },
+  {
+    elementType: 'labels.icon',
+    stylers: [{ visibility: 'off' }],
+  },
+  {
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#757575' }],
+  },
+  {
+    elementType: 'labels.text.stroke',
+    stylers: [{ color: '#212121' }],
+  },
+  {
+    featureType: 'administrative',
+    elementType: 'geometry',
+    stylers: [{ color: '#757575' }],
+  },
+  {
+    featureType: 'administrative.country',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#9e9e9e' }],
+  },
+  {
+    featureType: 'administrative.land_parcel',
+    stylers: [{ visibility: 'off' }],
+  },
+  {
+    featureType: 'administrative.locality',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#bdbdbd' }],
+  },
+  {
     featureType: 'poi',
     elementType: 'labels',
     stylers: [{ visibility: 'off' }],
+  },
+  {
+    featureType: 'poi',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#757575' }],
+  },
+  {
+    featureType: 'poi.park',
+    elementType: 'geometry',
+    stylers: [{ color: '#181818' }],
+  },
+  {
+    featureType: 'poi.park',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#616161' }],
+  },
+  {
+    featureType: 'road',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#2c2c2c' }],
+  },
+  {
+    featureType: 'road',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#8a8a8a' }],
+  },
+  {
+    featureType: 'road.arterial',
+    elementType: 'geometry',
+    stylers: [{ color: '#373737' }],
+  },
+  {
+    featureType: 'road.highway',
+    elementType: 'geometry',
+    stylers: [{ color: '#3c3c3c' }],
+  },
+  {
+    featureType: 'road.highway.controlled_access',
+    elementType: 'geometry',
+    stylers: [{ color: '#4e4e4e' }],
+  },
+  {
+    featureType: 'road.local',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#616161' }],
   },
   {
     featureType: 'transit',
@@ -157,14 +237,19 @@ export const MAP_STYLE = [
     stylers: [{ visibility: 'off' }],
   },
   {
-    featureType: 'water',
-    elementType: 'geometry',
-    stylers: [{ color: '#C9E8F0' }],
+    featureType: 'transit',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#757575' }],
   },
   {
-    featureType: 'landscape',
-    elementType: 'geometry.fill',
-    stylers: [{ color: '#F0F4F0' }],
+    featureType: 'water',
+    elementType: 'geometry',
+    stylers: [{ color: '#0e1626' }],
+  },
+  {
+    featureType: 'water',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#3d3d3d' }],
   },
 ];
 

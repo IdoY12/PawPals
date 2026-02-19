@@ -13,8 +13,6 @@ import {
   Dimensions,
   StatusBar,
   Keyboard,
-  NativeSyntheticEvent,
-  TextInputFocusEventData,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,10 +23,6 @@ import { LOGIN, REGISTER } from '../graphql/mutations';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '../constants/theme';
 import { isValidEmail, isValidPassword } from '../utils/helpers';
 import { UserType } from '../types';
-
-// ─── Isolated FormInput ─────────────────────────────────────
-// Manages its own focus state so that focus/blur only re-renders
-// THIS input wrapper – not the entire AuthScreen form.
 
 interface FormInputProps extends TextInputProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -41,7 +35,7 @@ const FormInput = React.memo<FormInputProps>(
     const [isFocused, setIsFocused] = useState(false);
 
     const handleFocus = useCallback(
-      (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+      (e: any) => {
         setIsFocused(true);
         onFocus?.(e);
       },
@@ -49,7 +43,7 @@ const FormInput = React.memo<FormInputProps>(
     );
 
     const handleBlur = useCallback(
-      (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+      (e: any) => {
         setIsFocused(false);
         onBlur?.(e);
       },
@@ -82,8 +76,6 @@ const FormInput = React.memo<FormInputProps>(
   },
 );
 
-// ─── AuthScreen ──────────────────────────────────────────────
-
 type AuthMode = 'login' | 'register';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -92,7 +84,6 @@ export const AuthScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const scrollRef = useRef<ScrollView>(null);
 
-  // Input refs for focus chaining (keyboard "next" button)
   const nameRef = useRef<TextInput>(null);
   const phoneRef = useRef<TextInput>(null);
   const emailRef = useRef<TextInput>(null);
@@ -112,8 +103,6 @@ export const AuthScreen: React.FC = () => {
   const [loginMutation, { loading: loginLoading }] = useMutation(LOGIN);
   const [registerMutation, { loading: registerLoading }] = useMutation(REGISTER);
   const loading = loginLoading || registerLoading;
-
-  // ─── Handlers ────────────────────────────────────────────
 
   const handleLogin = async () => {
     Keyboard.dismiss();
@@ -176,17 +165,14 @@ export const AuthScreen: React.FC = () => {
 
   const switchMode = (newMode: AuthMode) => {
     setMode(newMode);
-    // Scroll to top when switching modes to avoid disorientation
     setTimeout(() => scrollRef.current?.scrollTo({ y: 0, animated: true }), 50);
   };
-
-  // ─── Render ──────────────────────────────────────────────
 
   const isRegister = mode === 'register';
 
   return (
     <View style={[styles.screen, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="light-content" />
       <ScrollView
         ref={scrollRef}
         style={styles.scrollView}
@@ -200,7 +186,7 @@ export const AuthScreen: React.FC = () => {
         bounces={true}
         overScrollMode="always"
       >
-        {/* ── Brand Header ── */}
+        {/* Brand Header */}
         <View style={[styles.brandSection, isRegister && styles.brandSectionCompact]}>
           <View style={styles.logoRing}>
             <View style={styles.logoBg}>
@@ -217,7 +203,7 @@ export const AuthScreen: React.FC = () => {
           )}
         </View>
 
-        {/* ── Mode Toggle ── */}
+        {/* Mode Toggle */}
         <View style={styles.toggleWrapper}>
           <View style={styles.toggleTrack}>
             <TouchableOpacity
@@ -241,12 +227,10 @@ export const AuthScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* ── Form Card ── */}
+        {/* Form Card */}
         <View style={styles.card}>
-          {/* ── Register-only fields ── */}
           {isRegister && (
             <>
-              {/* Role Picker */}
               <Text style={styles.sectionLabel}>I want to:</Text>
               <View style={styles.roleRow}>
                 <TouchableOpacity
@@ -324,10 +308,8 @@ export const AuthScreen: React.FC = () => {
                 </TouchableOpacity>
               </View>
 
-              {/* Divider */}
               <View style={styles.divider} />
 
-              {/* Name */}
               <Text style={styles.fieldLabel}>Full Name</Text>
               <FormInput
                 icon="person-outline"
@@ -341,7 +323,6 @@ export const AuthScreen: React.FC = () => {
                 onSubmitEditing={() => phoneRef.current?.focus()}
               />
 
-              {/* Phone */}
               <Text style={styles.fieldLabel}>
                 Phone <Text style={styles.optionalTag}>(optional)</Text>
               </Text>
@@ -359,10 +340,8 @@ export const AuthScreen: React.FC = () => {
             </>
           )}
 
-          {/* ── Shared fields ── */}
           {isRegister && <View style={styles.divider} />}
 
-          {/* Email */}
           <Text style={[styles.fieldLabel, !isRegister && { marginTop: 0 }]}>
             Email
           </Text>
@@ -380,7 +359,6 @@ export const AuthScreen: React.FC = () => {
             onSubmitEditing={() => passwordRef.current?.focus()}
           />
 
-          {/* Password */}
           <Text style={styles.fieldLabel}>Password</Text>
           <FormInput
             icon="lock-closed-outline"
@@ -406,7 +384,6 @@ export const AuthScreen: React.FC = () => {
             }
           />
 
-          {/* ── Submit Button ── */}
           <TouchableOpacity
             style={[styles.primaryBtn, loading && styles.primaryBtnDisabled]}
             onPress={handleSubmit}
@@ -427,7 +404,6 @@ export const AuthScreen: React.FC = () => {
             )}
           </TouchableOpacity>
 
-          {/* Switch prompt */}
           <View style={styles.switchRow}>
             <Text style={styles.switchText}>
               {isRegister ? 'Already have an account?' : "Don't have an account?"}
@@ -440,7 +416,7 @@ export const AuthScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* ── Demo Quick-Fill ── */}
+        {/* Demo Quick-Fill */}
         {mode === 'login' && (
           <View style={styles.demoArea}>
             <View style={styles.demoLine}>
@@ -479,12 +455,9 @@ export const AuthScreen: React.FC = () => {
   );
 };
 
-// ─── Styles ──────────────────────────────────────────────
-
 const INPUT_HEIGHT = Platform.OS === 'ios' ? 50 : 48;
 
 const styles = StyleSheet.create({
-  // Layout - no KeyboardAvoidingView, pure ScrollView for reliable scrolling
   screen: {
     flex: 1,
     backgroundColor: COLORS.background,
@@ -494,10 +467,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: SPACING.lg,
-    // NOTE: no flexGrow here — this is the fix for the stuck scroll
   },
-
-  // ── Brand ──
   brandSection: {
     alignItems: 'center',
     marginTop: SPACING.xxxl,
@@ -540,8 +510,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginTop: SPACING.xs,
   },
-
-  // ── Mode Toggle ──
   toggleWrapper: {
     marginBottom: SPACING.lg,
   },
@@ -558,7 +526,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   toggleBtnActive: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     ...SHADOWS.md,
   },
   toggleLabel: {
@@ -570,20 +538,15 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontWeight: '700',
   },
-
-  // ── Card ──
   card: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     borderRadius: BORDER_RADIUS.xl,
     paddingHorizontal: SPACING.lg,
     paddingTop: SPACING.lg,
     paddingBottom: SPACING.xl,
     borderWidth: 1,
-    borderColor: COLORS.borderLight,
-    ...SHADOWS.lg,
+    borderColor: COLORS.border,
   },
-
-  // ── Section / Divider ──
   sectionLabel: {
     fontSize: FONTS.sizes.sm,
     fontWeight: '600',
@@ -594,11 +557,9 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: COLORS.borderLight,
+    backgroundColor: COLORS.border,
     marginVertical: SPACING.lg,
   },
-
-  // ── Role Cards ──
   roleRow: {
     flexDirection: 'row',
     gap: SPACING.md,
@@ -611,7 +572,7 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.lg,
     borderWidth: 1.5,
     borderColor: COLORS.border,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.card,
   },
   roleIconCircle: {
     width: 44,
@@ -631,8 +592,6 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
     marginTop: 2,
   },
-
-  // ── Fields ──
   fieldLabel: {
     fontSize: FONTS.sizes.sm,
     fontWeight: '600',
@@ -649,7 +608,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     height: INPUT_HEIGHT,
-    backgroundColor: COLORS.gray50,
+    backgroundColor: COLORS.gray100,
     borderRadius: BORDER_RADIUS.md,
     paddingHorizontal: SPACING.md,
     borderWidth: 1.5,
@@ -658,18 +617,14 @@ const styles = StyleSheet.create({
   },
   inputBoxFocused: {
     borderColor: COLORS.primary,
-    backgroundColor: COLORS.white,
-    // NOTE: No shadow/elevation here — changing elevation on focus causes
-    // native view recreation which strips the child TextInput of focus.
+    backgroundColor: COLORS.surfaceElevated,
   },
   textInput: {
     flex: 1,
     fontSize: FONTS.sizes.base,
     color: COLORS.textPrimary,
-    paddingVertical: 0, // prevent extra padding on Android
+    paddingVertical: 0,
   },
-
-  // ── Primary Button ──
   primaryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -679,7 +634,6 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.lg,
     marginTop: SPACING.xl,
     gap: SPACING.sm,
-    ...SHADOWS.lg,
   },
   primaryBtnDisabled: {
     opacity: 0.55,
@@ -697,8 +651,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
-  // ── Switch Prompt ──
   switchRow: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -715,8 +667,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.primary,
   },
-
-  // ── Demo ──
   demoArea: {
     marginTop: SPACING.xxl,
   },
@@ -745,14 +695,13 @@ const styles = StyleSheet.create({
   demoChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     paddingVertical: SPACING.sm + 2,
     paddingHorizontal: SPACING.base,
     borderRadius: BORDER_RADIUS.full,
     borderWidth: 1,
     borderColor: COLORS.border,
     gap: SPACING.sm,
-    ...SHADOWS.sm,
   },
   demoChipDot: {
     width: 8,

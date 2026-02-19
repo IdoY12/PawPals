@@ -139,7 +139,7 @@ export const UserCard: React.FC<UserCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.card,
     borderRadius: BORDER_RADIUS.xl,
     padding: SPACING.base,
     marginBottom: SPACING.md,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   availableBadge: {
     position: 'absolute', bottom: 0, right: 0,
     width: 18, height: 18, borderRadius: 9,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     justifyContent: 'center', alignItems: 'center',
     ...SHADOWS.sm,
   },
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   // Compact
   compactCard: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: COLORS.white, borderRadius: BORDER_RADIUS.lg,
+    backgroundColor: COLORS.card, borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.sm, marginRight: SPACING.sm,
     borderWidth: 1, borderColor: COLORS.borderLight,
     ...SHADOWS.sm,

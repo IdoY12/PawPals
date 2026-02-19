@@ -152,7 +152,6 @@ export interface CreateRequestInput {
 export type RootStackParamList = {
   Auth: undefined;
   Main: undefined;
-  Profile: { userId?: string };
   Chat: { userId: string; userName: string };
   RequestForm: { request?: Request };
   UserDetail: { user: User };

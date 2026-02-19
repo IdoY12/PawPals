@@ -88,7 +88,7 @@ export const reviewResolvers = {
       { input }: { input: CreateReviewInput },
       { user }: GraphQLContext
     ): Promise<IReview> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       const { revieweeId, requestId, rating, comment } = input;
 

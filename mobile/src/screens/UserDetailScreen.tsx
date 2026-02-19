@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: SPACING.xl,
     paddingBottom: SPACING.xl,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     borderBottomLeftRadius: BORDER_RADIUS.xxl,
     borderBottomRightRadius: BORDER_RADIUS.xxl,
     ...SHADOWS.lg,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
-    borderColor: COLORS.white,
+    borderColor: COLORS.surface,
   },
   heroName: {
     fontSize: FONTS.sizes.xxl,
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   card: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.card,
     borderRadius: BORDER_RADIUS.xl,
     padding: SPACING.base,
     borderWidth: 1,
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
   },
   // Reviews
   reviewCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.card,
     borderRadius: BORDER_RADIUS.xl,
     padding: SPACING.base,
     marginBottom: SPACING.sm,

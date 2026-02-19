@@ -89,7 +89,7 @@ export const userResolvers = {
       },
       { user }: GraphQLContext
     ): Promise<(IUser & { distance?: number })[]> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       // Convert radius from km to meters for MongoDB
       const radiusInMeters = radius * 1000;
@@ -114,7 +114,7 @@ export const userResolvers = {
           [longitude, latitude],
           u.location.coordinates as [number, number]
         );
-        return { ...u.toObject(), id: u._id.toString(), distance };
+        return { ...u.toObject(), id: u._id.toString(), distance } as any;
       });
     },
 
@@ -132,7 +132,7 @@ export const userResolvers = {
       },
       { user }: GraphQLContext
     ): Promise<(IUser & { distance?: number })[]> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       const radiusInMeters = radius * 1000;
 
@@ -155,7 +155,7 @@ export const userResolvers = {
           [longitude, latitude],
           s.location.coordinates as [number, number]
         );
-        return { ...s.toObject(), id: s._id.toString(), distance };
+        return { ...s.toObject(), id: s._id.toString(), distance } as any;
       });
     },
   },
@@ -241,7 +241,7 @@ export const userResolvers = {
       { input }: { input: ProfileUpdateInput },
       { user }: GraphQLContext
     ): Promise<IUser> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       const updateData: any = { ...input };
 
@@ -276,7 +276,7 @@ export const userResolvers = {
       { location }: { location: LocationInput },
       { user }: GraphQLContext
     ): Promise<IUser> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       if (!validateCoordinates(location.coordinates)) {
         throwValidationError('Invalid coordinates');
@@ -309,7 +309,7 @@ export const userResolvers = {
       { isAvailable, message }: { isAvailable: boolean; message?: string },
       { user }: GraphQLContext
     ): Promise<IUser> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       if (user.userType !== UserType.SITTER) {
         throwValidationError('Only sitters can toggle availability');
@@ -339,7 +339,7 @@ export const userResolvers = {
       { dog }: { dog: DogInput },
       { user }: GraphQLContext
     ): Promise<IUser> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       if (user.userType !== UserType.OWNER) {
         throwValidationError('Only owners can add dogs');
@@ -364,7 +364,7 @@ export const userResolvers = {
       { index, dog }: { index: number; dog: DogInput },
       { user }: GraphQLContext
     ): Promise<IUser> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       if (user.userType !== UserType.OWNER) {
         throwValidationError('Only owners can update dogs');
@@ -394,7 +394,7 @@ export const userResolvers = {
       { index }: { index: number },
       { user }: GraphQLContext
     ): Promise<IUser> => {
-      if (!user) throwAuthError();
+      if (!user) return throwAuthError();
 
       if (user.userType !== UserType.OWNER) {
         throwValidationError('Only owners can remove dogs');

@@ -17,6 +17,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -39,7 +41,7 @@ export default function App() {
         <ApolloProvider client={apolloClient}>
           <AuthProvider>
             <LocationProvider>
-              <StatusBar style="dark" backgroundColor={COLORS.white} />
+              <StatusBar style="light" backgroundColor={COLORS.background} />
               <AppNavigator />
             </LocationProvider>
           </AuthProvider>

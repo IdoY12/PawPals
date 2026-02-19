@@ -211,9 +211,9 @@ const styles = StyleSheet.create({
   filterContainer: {
     flexDirection: 'row',
     padding: SPACING.md,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.borderLight,
+    borderBottomColor: COLORS.border,
   },
   filterButton: {
     paddingVertical: SPACING.sm,
@@ -237,6 +237,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: COLORS.background,
   },
   list: {
     padding: SPACING.md,

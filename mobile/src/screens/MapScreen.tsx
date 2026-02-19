@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   FlatList,
-  ScrollView,
   Platform,
   Dimensions,
 } from 'react-native';
@@ -45,7 +44,6 @@ export const MapScreen: React.FC = () => {
 
   const isOwner = user?.userType === 'owner';
 
-  // Auto-update user location in backend when GPS coordinates change
   const [updateLocationMutation] = useMutation(UPDATE_LOCATION);
   const locationUpdatedRef = useRef(false);
 
@@ -60,7 +58,6 @@ export const MapScreen: React.FC = () => {
     }
   }, [coordinates]);
 
-  // For owners: fetch sitters (both available via dedicated query AND general nearby)
   const { data: sittersData, loading: sittersLoading, refetch: refetchSitters } = useQuery(
     GET_NEARBY_USERS,
     {
@@ -76,7 +73,6 @@ export const MapScreen: React.FC = () => {
     }
   );
 
-  // For sitters: fetch nearby requests
   const { data: requestsData, loading: requestsLoading, refetch: refetchRequests } = useQuery(
     GET_NEARBY_REQUESTS,
     {
@@ -91,7 +87,6 @@ export const MapScreen: React.FC = () => {
     }
   );
 
-  // For sitters: also fetch nearby owners
   const { data: ownersData } = useQuery(
     GET_NEARBY_USERS,
     {
@@ -112,12 +107,9 @@ export const MapScreen: React.FC = () => {
   const allOwners: User[] = ownersData?.nearbyUsers || [];
   const loading = sittersLoading || requestsLoading;
 
-  // Filter out owners who already have a visible request marker to prevent
-  // duplicate overlapping markers at the same location.
   const requestOwnerIds = new Set(requests.map((r) => r.owner?.id).filter(Boolean));
   const owners = allOwners.filter((o) => !requestOwnerIds.has(o.id));
 
-  // Center map on user location
   useEffect(() => {
     if (coordinates && mapRef.current) {
       mapRef.current.animateToRegion({
@@ -205,7 +197,6 @@ export const MapScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Map - Use Apple Maps on iOS (no API key needed), Google on Android */}
       <MapView
         ref={mapRef}
         style={styles.map}
@@ -214,9 +205,9 @@ export const MapScreen: React.FC = () => {
         showsUserLocation={true}
         showsMyLocationButton={false}
         showsCompass={false}
-        customMapStyle={Platform.OS === 'android' ? MAP_STYLE : undefined}
+        customMapStyle={MAP_STYLE}
+        userInterfaceStyle="dark"
       >
-        {/* Sitter markers (for owners) */}
         {isOwner &&
           sitters.map((sitter) => (
             <UserMarker
@@ -226,7 +217,6 @@ export const MapScreen: React.FC = () => {
             />
           ))}
 
-        {/* Request markers (for sitters) */}
         {!isOwner &&
           requests.map((request) => (
             <RequestMarker
@@ -236,7 +226,6 @@ export const MapScreen: React.FC = () => {
             />
           ))}
 
-        {/* Owner markers (for sitters - show owners who have dogs) */}
         {!isOwner &&
           owners.map((owner) => (
             <UserMarker
@@ -329,7 +318,6 @@ export const MapScreen: React.FC = () => {
       {/* Bottom Sheet List */}
       {showList && (
         <View style={styles.listContainer}>
-          {/* Handle bar */}
           <View style={styles.sheetHandle}>
             <View style={styles.handleBar} />
           </View>
@@ -341,7 +329,7 @@ export const MapScreen: React.FC = () => {
               onPress={() => setShowList(false)}
               style={styles.closeButton}
             >
-              <Ionicons name="close" size={20} color={COLORS.gray600} />
+              <Ionicons name="close" size={20} color={COLORS.textSecondary} />
             </TouchableOpacity>
           </View>
 
@@ -416,7 +404,6 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
-  // Loading
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -446,7 +433,6 @@ const styles = StyleSheet.create({
     fontSize: FONTS.sizes.md,
     color: COLORS.textMuted,
   },
-  // Error
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -475,7 +461,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
   },
-  // Radius pills
   radiusContainer: {
     position: 'absolute',
     top: Platform.OS === 'ios' ? 16 : 12,
@@ -485,7 +470,7 @@ const styles = StyleSheet.create({
   },
   radiusPillRow: {
     flexDirection: 'row',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     borderRadius: BORDER_RADIUS.full,
     padding: SPACING.xs,
     ...SHADOWS.lg,
@@ -506,7 +491,6 @@ const styles = StyleSheet.create({
   radiusPillTextActive: {
     color: COLORS.white,
   },
-  // Controls
   controlsContainer: {
     position: 'absolute',
     right: SPACING.base,
@@ -516,13 +500,12 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.sm,
     ...SHADOWS.lg,
   },
-  // Bottom bar
   bottomBar: {
     position: 'absolute',
     bottom: SPACING.lg,
@@ -535,7 +518,7 @@ const styles = StyleSheet.create({
   countChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.base,
     borderRadius: BORDER_RADIUS.full,
@@ -550,7 +533,7 @@ const styles = StyleSheet.create({
   refreshingChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.md,
     borderRadius: BORDER_RADIUS.full,
@@ -561,14 +544,13 @@ const styles = StyleSheet.create({
     fontSize: FONTS.sizes.xs,
     color: COLORS.textMuted,
   },
-  // Bottom sheet
   listContainer: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     height: '60%',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     borderTopLeftRadius: BORDER_RADIUS.xxl,
     borderTopRightRadius: BORDER_RADIUS.xxl,
     ...SHADOWS.xl,
@@ -591,7 +573,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingBottom: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.borderLight,
+    borderBottomColor: COLORS.border,
   },
   listTitle: {
     fontSize: FONTS.sizes.lg,
