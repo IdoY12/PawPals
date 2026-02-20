@@ -16,6 +16,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { GET_CONVERSATIONS } from '../graphql/queries';
 import { MESSAGE_RECEIVED } from '../graphql/subscriptions';
 import { useAuth } from '../context/AuthContext';
+import { initializeSocket, getSocket } from '../utils/socket';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '../constants/theme';
 import { formatRelativeTime, truncateText, getInitials } from '../utils/helpers';
 import { Conversation, RootStackParamList } from '../types';
@@ -30,15 +31,32 @@ export const ChatListScreen: React.FC = () => {
     fetchPolicy: 'cache-and-network',
   });
 
-  // Subscribe to new messages
+  // Subscribe to new messages via GraphQL subscription
   const { data: newMessageData } = useSubscription(MESSAGE_RECEIVED);
 
-  // Refetch conversations when new message arrives
+  // Refetch conversations when new message arrives (subscription)
   useEffect(() => {
     if (newMessageData?.messageReceived) {
       refetch();
     }
   }, [newMessageData]);
+
+  // Also listen via Socket.io for instant updates
+  useEffect(() => {
+    let mounted = true;
+    const setup = async () => {
+      await initializeSocket();
+      const socket = getSocket();
+      if (socket && mounted) {
+        const handler = () => { refetch(); };
+        socket.on('message:received', handler);
+        return () => { socket.off('message:received', handler); };
+      }
+    };
+    let cleanup: (() => void) | undefined;
+    setup().then(c => { cleanup = c; });
+    return () => { mounted = false; cleanup?.(); };
+  }, [refetch]);
 
   const conversations: Conversation[] = data?.getConversations || [];
 

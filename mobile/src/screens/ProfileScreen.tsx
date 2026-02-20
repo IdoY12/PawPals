@@ -24,6 +24,13 @@ import { formatRating, getInitials } from '../utils/helpers';
 
 const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:4000';
 
+interface EditableDog {
+  name: string;
+  breed: string;
+  age: string;
+  description: string;
+}
+
 export const ProfileScreen: React.FC = () => {
   const { user, logout, updateUser, token } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
@@ -34,6 +41,14 @@ export const ProfileScreen: React.FC = () => {
   const [availabilityMessage, setAvailabilityMessage] = useState(user?.availabilityMessage || '');
   const [isAvailable, setIsAvailable] = useState(user?.isAvailable || false);
   const [uploading, setUploading] = useState(false);
+  const [editDogs, setEditDogs] = useState<EditableDog[]>(
+    (user?.dogs || []).map(d => ({
+      name: d.name,
+      breed: d.breed,
+      age: d.age?.toString() || '',
+      description: d.description || '',
+    }))
+  );
 
   const { data: reviewsData } = useQuery(GET_USER_REVIEWS, {
     variables: { userId: user?.id, limit: 5 },
@@ -51,23 +66,46 @@ export const ProfileScreen: React.FC = () => {
 
   const handleSaveProfile = async () => {
     try {
-      const { data } = await updateProfile({
-        variables: {
-          input: {
-            name,
-            phone: phone || undefined,
-            bio: bio || undefined,
-            hourlyRate: hourlyRate ? parseFloat(hourlyRate) : undefined,
-            availabilityMessage: availabilityMessage || undefined,
-          },
-        },
-      });
+      const input: any = {
+        name,
+        phone: phone || undefined,
+        bio: bio || undefined,
+        hourlyRate: hourlyRate ? parseFloat(hourlyRate) : undefined,
+        availabilityMessage: availabilityMessage || undefined,
+      };
+      if (!isSitter) {
+        input.dogs = editDogs
+          .filter(d => d.name.trim())
+          .map(d => ({
+            name: d.name.trim(),
+            breed: d.breed.trim(),
+            age: parseInt(d.age, 10) || 0,
+            description: d.description.trim() || undefined,
+          }));
+      }
+      const { data } = await updateProfile({ variables: { input } });
       updateUser(data.updateProfile);
       setIsEditing(false);
       Alert.alert('Saved', 'Your profile has been updated.');
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to update profile.');
     }
+  };
+
+  const handleUpdateDogField = (index: number, field: keyof EditableDog, value: string) => {
+    setEditDogs(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  const handleAddDog = () => {
+    setEditDogs(prev => [...prev, { name: '', breed: '', age: '', description: '' }]);
+  };
+
+  const handleRemoveDog = (index: number) => {
+    setEditDogs(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleToggleAvailability = async (value: boolean) => {
@@ -210,7 +248,14 @@ export const ProfileScreen: React.FC = () => {
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>Profile Information</Text>
-          <TouchableOpacity onPress={() => setIsEditing(!isEditing)}>
+          <TouchableOpacity onPress={() => {
+            if (isEditing) {
+              setEditDogs((user?.dogs || []).map(d => ({
+                name: d.name, breed: d.breed, age: d.age?.toString() || '', description: d.description || '',
+              })));
+            }
+            setIsEditing(!isEditing);
+          }}>
             <Text style={styles.editLink}>{isEditing ? 'Cancel' : 'Edit'}</Text>
           </TouchableOpacity>
         </View>
@@ -269,21 +314,79 @@ export const ProfileScreen: React.FC = () => {
       </View>
 
       {/* Dogs Card (Owners) */}
-      {!isSitter && user?.dogs && user.dogs.length > 0 && (
+      {!isSitter && (
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>My Dogs</Text>
-          {user.dogs.map((dog, idx) => (
-            <View key={idx} style={styles.dogRow}>
-              <View style={styles.dogIconWrap}>
-                <Ionicons name="paw" size={18} color={COLORS.owner} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.dogName}>{dog.name}</Text>
-                <Text style={styles.dogMeta}>{dog.breed} · {dog.age} yr</Text>
-                {dog.description ? <Text style={styles.dogDesc}>{dog.description}</Text> : null}
-              </View>
-            </View>
-          ))}
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>My Dogs</Text>
+          </View>
+          {isEditing ? (
+            <>
+              {editDogs.map((dog, idx) => (
+                <View key={idx} style={styles.editDogBlock}>
+                  <View style={styles.editDogHeader}>
+                    <View style={styles.dogIconWrap}>
+                      <Ionicons name="paw" size={18} color={COLORS.owner} />
+                    </View>
+                    <Text style={styles.editDogLabel}>Dog {idx + 1}</Text>
+                    <TouchableOpacity onPress={() => handleRemoveDog(idx)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                      <Ionicons name="close-circle" size={22} color={COLORS.error} />
+                    </TouchableOpacity>
+                  </View>
+                  <TextInput
+                    style={styles.dogEditInput}
+                    value={dog.name}
+                    onChangeText={v => handleUpdateDogField(idx, 'name', v)}
+                    placeholder="Name"
+                    placeholderTextColor={COLORS.textMuted}
+                  />
+                  <TextInput
+                    style={styles.dogEditInput}
+                    value={dog.breed}
+                    onChangeText={v => handleUpdateDogField(idx, 'breed', v)}
+                    placeholder="Breed"
+                    placeholderTextColor={COLORS.textMuted}
+                  />
+                  <TextInput
+                    style={styles.dogEditInput}
+                    value={dog.age}
+                    onChangeText={v => handleUpdateDogField(idx, 'age', v)}
+                    placeholder="Age"
+                    placeholderTextColor={COLORS.textMuted}
+                    keyboardType="numeric"
+                  />
+                  <TextInput
+                    style={[styles.dogEditInput, { minHeight: 50 }]}
+                    value={dog.description}
+                    onChangeText={v => handleUpdateDogField(idx, 'description', v)}
+                    placeholder="Description (optional)"
+                    placeholderTextColor={COLORS.textMuted}
+                    multiline
+                  />
+                </View>
+              ))}
+              <TouchableOpacity style={styles.addDogBtn} onPress={handleAddDog} activeOpacity={0.7}>
+                <Ionicons name="add-circle-outline" size={20} color={COLORS.primary} />
+                <Text style={styles.addDogBtnText}>Add Dog</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            user?.dogs && user.dogs.length > 0 ? (
+              user.dogs.map((dog, idx) => (
+                <View key={idx} style={styles.dogRow}>
+                  <View style={styles.dogIconWrap}>
+                    <Ionicons name="paw" size={18} color={COLORS.owner} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.dogName}>{dog.name}</Text>
+                    <Text style={styles.dogMeta}>{dog.breed} · {dog.age} yr</Text>
+                    {dog.description ? <Text style={styles.dogDesc}>{dog.description}</Text> : null}
+                  </View>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.placeholder}>No dogs added yet. Tap Edit to add your dogs.</Text>
+            )
+          )}
         </View>
       )}
 
@@ -434,6 +537,47 @@ const styles = StyleSheet.create({
   dogName: { fontSize: FONTS.sizes.base, fontWeight: '600', color: COLORS.textPrimary },
   dogMeta: { fontSize: FONTS.sizes.sm, color: COLORS.textMuted, marginTop: 2 },
   dogDesc: { fontSize: FONTS.sizes.sm, color: COLORS.textSecondary, marginTop: SPACING.xs, fontStyle: 'italic' },
+  // Dog editing
+  editDogBlock: {
+    paddingVertical: SPACING.md,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
+  },
+  editDogHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+    gap: SPACING.sm,
+  },
+  editDogLabel: {
+    flex: 1,
+    fontSize: FONTS.sizes.md,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  dogEditInput: {
+    fontSize: FONTS.sizes.md,
+    color: COLORS.textPrimary,
+    backgroundColor: COLORS.gray50,
+    borderRadius: BORDER_RADIUS.md,
+    padding: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    marginBottom: SPACING.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  addDogBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.md,
+    gap: SPACING.xs,
+  },
+  addDogBtnText: {
+    fontSize: FONTS.sizes.md,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
   // Reviews
   reviewRow: { paddingVertical: SPACING.md, borderBottomWidth: 1, borderBottomColor: COLORS.borderLight },
   reviewHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.xs },

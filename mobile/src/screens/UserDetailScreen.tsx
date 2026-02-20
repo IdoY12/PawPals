@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,17 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  TextInput,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useQuery } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 import { GET_USER_REVIEWS } from '../graphql/queries';
+import { CREATE_REVIEW } from '../graphql/mutations';
+import { useAuth } from '../context/AuthContext';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '../constants/theme';
 import { formatRating, formatDistance, getInitials, formatRelativeTime } from '../utils/helpers';
 import { RootStackParamList, User, Review } from '../types';
@@ -22,22 +27,61 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 export const UserDetailScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<UserDetailRouteProps>();
+  const { user: currentUser } = useAuth();
   const { user } = route.params;
 
-  const { data: reviewsData } = useQuery(GET_USER_REVIEWS, {
+  const { data: reviewsData, refetch: refetchReviews } = useQuery(GET_USER_REVIEWS, {
     variables: { userId: user.id, limit: 10 },
   });
+
+  const isOwnerViewingSitter = currentUser?.userType === 'owner' && user.userType === 'sitter';
+
+  const [createReview, { loading: submittingReview }] = useMutation(CREATE_REVIEW);
+
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
   const isSitter = user.userType === 'sitter';
   const typeColor = isSitter ? COLORS.sitter : COLORS.owner;
   const typeBg = isSitter ? COLORS.sitterLight : COLORS.ownerLight;
   const reviews: Review[] = reviewsData?.getUserReviews || [];
+  const showReviewForm = isOwnerViewingSitter && !reviewSubmitted;
 
   const handleMessagePress = () => {
     navigation.navigate('Chat', {
       userId: user.id,
       userName: user.name,
     });
+  };
+
+  const handleSubmitReview = async () => {
+    if (reviewRating === 0) {
+      Alert.alert('Rating Required', 'Please select a star rating.');
+      return;
+    }
+    if (!reviewComment.trim()) {
+      Alert.alert('Comment Required', 'Please write a review comment.');
+      return;
+    }
+    try {
+      await createReview({
+        variables: {
+          input: {
+            revieweeId: user.id,
+            rating: reviewRating,
+            comment: reviewComment.trim(),
+          },
+        },
+      });
+      Alert.alert('Thank You', 'Your review has been submitted.');
+      setReviewRating(0);
+      setReviewComment('');
+      setReviewSubmitted(true);
+      refetchReviews();
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to submit review.');
+    }
   };
 
   return (
@@ -212,6 +256,54 @@ export const UserDetailScreen: React.FC = () => {
           ))}
         </View>
       ) : null}
+
+      {/* ── Leave a Review ── */}
+      {showReviewForm && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Leave a Review</Text>
+          <View style={styles.card}>
+            <View style={styles.starSelector}>
+              {[1, 2, 3, 4, 5].map(star => (
+                <TouchableOpacity
+                  key={star}
+                  onPress={() => setReviewRating(star)}
+                  activeOpacity={0.6}
+                  hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
+                >
+                  <Ionicons
+                    name={star <= reviewRating ? 'star' : 'star-outline'}
+                    size={32}
+                    color={star <= reviewRating ? COLORS.star : COLORS.starEmpty}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+            <TextInput
+              style={styles.reviewInput}
+              value={reviewComment}
+              onChangeText={setReviewComment}
+              placeholder="Write your review..."
+              placeholderTextColor={COLORS.textMuted}
+              multiline
+              numberOfLines={3}
+              maxLength={500}
+              textAlignVertical="top"
+            />
+            <TouchableOpacity
+              style={[styles.submitReviewBtn, submittingReview && { opacity: 0.6 }]}
+              onPress={handleSubmitReview}
+              disabled={submittingReview}
+              activeOpacity={0.8}
+            >
+              {submittingReview ? (
+                <ActivityIndicator color={COLORS.white} />
+              ) : (
+                <Text style={styles.submitReviewBtnText}>Submit Review</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
 
       {/* ── CTA Button ── */}
       <View style={styles.ctaSection}>
@@ -479,6 +571,35 @@ const styles = StyleSheet.create({
     fontSize: FONTS.sizes.sm,
     color: COLORS.textSecondary,
     lineHeight: 20,
+  },
+  // Review form
+  starSelector: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    marginBottom: SPACING.md,
+  },
+  reviewInput: {
+    backgroundColor: COLORS.gray50,
+    borderRadius: BORDER_RADIUS.md,
+    padding: SPACING.md,
+    fontSize: FONTS.sizes.md,
+    color: COLORS.textPrimary,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    minHeight: 80,
+    marginBottom: SPACING.md,
+  },
+  submitReviewBtn: {
+    backgroundColor: COLORS.secondary,
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    alignItems: 'center',
+  },
+  submitReviewBtnText: {
+    fontSize: FONTS.sizes.md,
+    fontWeight: '700',
+    color: COLORS.white,
   },
   // CTA
   ctaSection: {

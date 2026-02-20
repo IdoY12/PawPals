@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ActivityIndicator, View, StyleSheet, Platform } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { useQuery } from '@apollo/client';
 import { GET_UNREAD_COUNT } from '../graphql/queries';
+import { initializeSocket, getSocket } from '../utils/socket';
 import {
   AuthScreen,
   MapScreen,
@@ -39,7 +40,23 @@ const DarkNavTheme = {
 
 const MainTabs: React.FC = () => {
   const { user } = useAuth();
-  const { data } = useQuery(GET_UNREAD_COUNT, { pollInterval: 30000 });
+  const { data, refetch } = useQuery(GET_UNREAD_COUNT, { pollInterval: 5000 });
+
+  useEffect(() => {
+    let mounted = true;
+    const setup = async () => {
+      await initializeSocket();
+      const socket = getSocket();
+      if (socket && mounted) {
+        const handler = () => { refetch(); };
+        socket.on('message:received', handler);
+        return () => { socket.off('message:received', handler); };
+      }
+    };
+    let cleanup: (() => void) | undefined;
+    setup().then(c => { cleanup = c; });
+    return () => { mounted = false; cleanup?.(); };
+  }, [refetch]);
 
   const unreadCount = data?.getUnreadCount || 0;
   const isOwner = user?.userType === 'owner';

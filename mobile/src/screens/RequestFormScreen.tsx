@@ -25,6 +25,20 @@ import { RootStackParamList } from '../types';
 
 type RequestFormRouteProps = RouteProp<RootStackParamList, 'RequestForm'>;
 
+const safeDate = (raw: string | number | undefined | null, fallback: Date): Date => {
+  if (raw == null) return fallback;
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? fallback : d;
+};
+
+const safeDateString = (d: Date): string => {
+  try {
+    return formatDate(d.toISOString());
+  } catch {
+    return 'Invalid date';
+  }
+};
+
 export const RequestFormScreen: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute<RequestFormRouteProps>();
@@ -42,12 +56,10 @@ export const RequestFormScreen: React.FC = () => {
     existingRequest?.preferredRate?.toString() || ''
   );
   const [startDate, setStartDate] = useState(
-    existingRequest ? new Date(existingRequest.startDate) : new Date()
+    safeDate(existingRequest?.startDate, new Date())
   );
   const [endDate, setEndDate] = useState(
-    existingRequest
-      ? new Date(existingRequest.endDate)
-      : new Date(Date.now() + 24 * 60 * 60 * 1000)
+    safeDate(existingRequest?.endDate, new Date(Date.now() + 24 * 60 * 60 * 1000))
   );
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
@@ -141,7 +153,7 @@ export const RequestFormScreen: React.FC = () => {
       Alert.alert('Missing Information', 'Please describe what you need help with.');
       return false;
     }
-    if (startDate < new Date(new Date().setHours(0, 0, 0, 0))) {
+    if (!isEditing && startDate < new Date(new Date().setHours(0, 0, 0, 0))) {
       Alert.alert('Invalid Date', 'Start date cannot be in the past.');
       return false;
     }
@@ -225,7 +237,7 @@ export const RequestFormScreen: React.FC = () => {
     onChange: (e: DateTimePickerEvent, d?: Date) => void,
     onDone: () => void,
     onCancel: () => void,
-    minDate: Date,
+    minDate: Date | undefined,
     title: string
   ) => (
     <Modal
@@ -253,6 +265,8 @@ export const RequestFormScreen: React.FC = () => {
             onChange={onChange}
             minimumDate={minDate}
             style={styles.picker}
+            textColor={COLORS.textPrimary}
+            themeVariant="dark"
           />
         </View>
       </View>
@@ -315,7 +329,7 @@ export const RequestFormScreen: React.FC = () => {
               </View>
               <View>
                 <Text style={styles.dateLabel}>From</Text>
-                <Text style={styles.dateValue}>{formatDate(startDate.toISOString())}</Text>
+                <Text style={styles.dateValue}>{safeDateString(startDate)}</Text>
               </View>
             </TouchableOpacity>
 
@@ -333,29 +347,29 @@ export const RequestFormScreen: React.FC = () => {
               </View>
               <View>
                 <Text style={styles.dateLabel}>Until</Text>
-                <Text style={styles.dateValue}>{formatDate(endDate.toISOString())}</Text>
+                <Text style={styles.dateValue}>{safeDateString(endDate)}</Text>
               </View>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* iOS Date Picker Modals */}
-        {Platform.OS === 'ios' && renderIOSPickerModal(
+        {/* iOS Date Picker Modals — only mount when open to avoid DateTimePicker validation on hidden mount */}
+        {Platform.OS === 'ios' && showStartPicker && renderIOSPickerModal(
           showStartPicker,
           tempStartDate,
           handleStartDateChange,
           confirmStartDate,
           () => cancelPicker('start'),
-          new Date(),
+          isEditing ? undefined : new Date(),
           'Start Date'
         )}
-        {Platform.OS === 'ios' && renderIOSPickerModal(
+        {Platform.OS === 'ios' && showEndPicker && renderIOSPickerModal(
           showEndPicker,
           tempEndDate,
           handleEndDateChange,
           confirmEndDate,
           () => cancelPicker('end'),
-          startDate,
+          isEditing ? undefined : startDate,
           'End Date'
         )}
 
@@ -366,7 +380,7 @@ export const RequestFormScreen: React.FC = () => {
             mode="date"
             display="default"
             onChange={handleStartDateChange}
-            minimumDate={new Date()}
+            minimumDate={isEditing ? undefined : new Date()}
           />
         )}
         {Platform.OS === 'android' && showEndPicker && (
@@ -375,7 +389,7 @@ export const RequestFormScreen: React.FC = () => {
             mode="date"
             display="default"
             onChange={handleEndDateChange}
-            minimumDate={startDate}
+            minimumDate={isEditing ? undefined : startDate}
           />
         )}
 

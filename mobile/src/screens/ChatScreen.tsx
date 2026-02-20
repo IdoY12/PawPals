@@ -88,23 +88,35 @@ export const ChatScreen: React.FC = () => {
 
   // Initialize socket and join conversation
   useEffect(() => {
+    let socketCleanup: (() => void) | undefined;
+
     const setupSocket = async () => {
       await initializeSocket();
       joinConversation(conversationId);
 
       const socket = getSocket();
       if (socket) {
-        socket.on('typing:started', (data: { userId: string }) => {
-          if (data.userId === userId) {
-            setOtherUserTyping(true);
-          }
-        });
+        const onTypingStarted = (data: { userId: string }) => {
+          if (data.userId === userId) setOtherUserTyping(true);
+        };
+        const onTypingStopped = (data: { userId: string }) => {
+          if (data.userId === userId) setOtherUserTyping(false);
+        };
+        const onNewMessage = () => {
+          refetch();
+        };
 
-        socket.on('typing:stopped', (data: { userId: string }) => {
-          if (data.userId === userId) {
-            setOtherUserTyping(false);
-          }
-        });
+        socket.on('typing:started', onTypingStarted);
+        socket.on('typing:stopped', onTypingStopped);
+        socket.on('message:new', onNewMessage);
+        socket.on('message:received', onNewMessage);
+
+        socketCleanup = () => {
+          socket.off('typing:started', onTypingStarted);
+          socket.off('typing:stopped', onTypingStopped);
+          socket.off('message:new', onNewMessage);
+          socket.off('message:received', onNewMessage);
+        };
       }
     };
 
@@ -115,6 +127,7 @@ export const ChatScreen: React.FC = () => {
 
     return () => {
       leaveConversation(conversationId);
+      socketCleanup?.();
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
